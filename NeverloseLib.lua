@@ -9,14 +9,20 @@ local CoreGui = game:GetService("CoreGui")
 
 local function New(class, properties, children)
     local instance = Instance.new(class)
+    local parent = properties.Parent
+    properties.Parent = nil
+    
     for property, value in pairs(properties) do
         instance[property] = value
     end
+    
     if children then
         for _, child in pairs(children) do
             child.Parent = instance
         end
     end
+    
+    instance.Parent = parent
     return instance
 end
 
@@ -251,13 +257,28 @@ function Library:CreateWindow(title)
         }, { New("UICorner", { CornerRadius = UDim.new(0, 6) }) })
 
         local Page = New("ScrollingFrame", {
+            Name = "Page_"..name,
             Size = UDim2.new(1, 0, 1, 0),
             BackgroundTransparency = 1,
             Visible = false,
             ScrollBarThickness = 2,
             ScrollBarImageColor3 = Color3.fromRGB(60, 60, 60),
+            CanvasSize = UDim2.new(0, 0, 0, 0),
+            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+            ZIndex = 5,
             Parent = ContentArea
-        }, { New("UIListLayout", { Padding = UDim.new(0, 8) }) })
+        }, { 
+            New("UIListLayout", { 
+                Padding = UDim.new(0, 8),
+                SortOrder = Enum.SortOrder.LayoutOrder
+            }),
+            New("UIPadding", {
+                PaddingLeft = UDim.new(0, 5),
+                PaddingRight = UDim.new(0, 5),
+                PaddingTop = UDim.new(0, 5),
+                PaddingBottom = UDim.new(0, 5)
+            })
+        })
 
         TabButton.MouseButton1Click:Connect(function()
             for _, t in pairs(Window.Tabs) do
@@ -269,9 +290,12 @@ function Library:CreateWindow(title)
         end)
 
         if #Window.Tabs == 0 then
-            Page.Visible = true
-            TabButton.BackgroundColor3 = Color3.fromRGB(20,20,20)
-            TabButton.TextColor3 = Library.AccentColor
+            task.spawn(function()
+                task.wait(0.1) -- small delay to ensure rendering
+                Page.Visible = true
+                TabButton.BackgroundColor3 = Color3.fromRGB(20,20,20)
+                TabButton.TextColor3 = Library.AccentColor
+            end)
         end
 
         function Tab:CreateButton(text, callback)
@@ -283,6 +307,7 @@ function Library:CreateWindow(title)
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 AutoButtonColor = false,
+                ZIndex = 6,
                 Parent = Page
             }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
 
@@ -304,6 +329,7 @@ function Library:CreateWindow(title)
             local ToggleFrame = New("Frame", {
                 Size = UDim2.new(1, -10, 0, 40),
                 BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+                ZIndex = 6,
                 Parent = Page
             }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
 
@@ -347,6 +373,78 @@ function Library:CreateWindow(title)
                 TweenService:Create(SwitchBG, TweenInfo.new(0.3), { BackgroundColor3 = state and Library.AccentColor or Color3.fromRGB(60, 60, 60) }):Play()
                 TweenService:Create(Circle, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = state and UDim2.new(1, -17, 0.5, 0) or UDim2.new(0, 3, 0.5, 0) }):Play()
                 callback(state)
+            end)
+        end
+
+        function Tab:CreateSlider(text, min, max, default, callback)
+            local SliderFrame = New("Frame", {
+                Size = UDim2.new(1, -10, 0, 50),
+                BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+                ZIndex = 6,
+                Parent = Page
+            }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
+
+            New("TextLabel", {
+                Size = UDim2.new(1, -60, 0, 30),
+                Position = UDim2.new(0, 15, 0, 0),
+                BackgroundTransparency = 1,
+                Text = text,
+                TextColor3 = Color3.fromRGB(220, 220, 220),
+                Font = Enum.Font.Gotham,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = SliderFrame
+            })
+
+            local ValueLabel = New("TextLabel", {
+                Size = UDim2.new(0, 40, 0, 30),
+                Position = UDim2.new(1, -55, 0, 0),
+                BackgroundTransparency = 1,
+                Text = tostring(default),
+                TextColor3 = Library.AccentColor,
+                Font = Enum.Font.GothamBold,
+                TextSize = 14,
+                Parent = SliderFrame
+            })
+
+            local SliderBG = New("Frame", {
+                Size = UDim2.new(1, -30, 0, 4),
+                Position = UDim2.new(0.5, 0, 0.8, 0),
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+                Parent = SliderFrame
+            }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+
+            local SliderBar = New("Frame", {
+                Size = UDim2.new((default - min) / (max - min), 0, 1, 0),
+                BackgroundColor3 = Library.AccentColor,
+                Parent = SliderBG
+            }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+
+            local function Update(input)
+                local pos = math.clamp((input.Position.X - SliderBG.AbsolutePosition.X) / SliderBG.AbsoluteSize.X, 0, 1)
+                local val = math.floor(min + (max - min) * pos)
+                ValueLabel.Text = tostring(val)
+                TweenService:Create(SliderBar, TweenInfo.new(0.1), { Size = UDim2.new(pos, 0, 1, 0) }):Play()
+                callback(val)
+            end
+
+            local dragging = false
+            SliderFrame.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = true
+                    Update(input)
+                end
+            end)
+            SliderFrame.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = false
+                end
+            end)
+            UserInputService.InputChanged:Connect(function(input)
+                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    Update(input)
+                end
             end)
         end
 
