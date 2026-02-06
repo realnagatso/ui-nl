@@ -8,6 +8,40 @@ function Library:ChangeAccent(color)
     Library.AccentColor = color
     for _, obj in pairs(Library.ThemeObjects) do
         if obj.Type == "Text" then
+            if obj.IsTab then
+                if obj.Instance.Parent.Parent.Visible then -- Check if it's the active page owner (simplified)
+                    -- For tabs, we'll handle them differently to avoid non-active ones becoming colored
+                end
+            else
+                obj.Instance.TextColor3 = color
+            end
+        elseif obj.Type == "Background" then
+            obj.Instance.BackgroundColor3 = color
+        elseif obj.Type == "Toggle" and obj.GetState() then
+            obj.Instance.BackgroundColor3 = color
+        elseif obj.Type == "Slider" then
+            obj.Instance.BackgroundColor3 = color
+            obj.Label.TextColor3 = color
+        end
+    end
+end
+-- Improved Tab color handling
+local function UpdateTabColors()
+    for _, obj in pairs(Library.ThemeObjects) do
+        if obj.Type == "Tab" then
+            if obj.Page.Visible then
+                obj.Instance.TextColor3 = Library.AccentColor
+            else
+                obj.Instance.TextColor3 = Color3.fromRGB(150, 150, 150)
+            end
+        end
+    end
+end
+
+function Library:ChangeAccent(color)
+    Library.AccentColor = color
+    for _, obj in pairs(Library.ThemeObjects) do
+        if obj.Type == "Text" then
             obj.Instance.TextColor3 = color
         elseif obj.Type == "Background" then
             obj.Instance.BackgroundColor3 = color
@@ -16,6 +50,8 @@ function Library:ChangeAccent(color)
         elseif obj.Type == "Slider" then
             obj.Instance.BackgroundColor3 = color
             obj.Label.TextColor3 = color
+        elseif obj.Type == "Tab" then
+            UpdateTabColors()
         end
     end
 end
@@ -196,10 +232,12 @@ function Library:CreateWindow(title)
     -- Sidebar
     local Sidebar = New("ScrollingFrame", {
         Name = "Sidebar",
-        Size = UDim2.new(0, 130, 1, -110), -- Adjusted size for profile
+        Size = UDim2.new(0, 130, 1, -110),
         Position = UDim2.new(0, 5, 0, 45),
         BackgroundTransparency = 1,
         ScrollBarThickness = 0,
+        CanvasSize = UDim2.new(0, 0, 0, 0),
+        AutomaticCanvasSize = Enum.AutomaticSize.Y,
         Parent = MainFrame
     }, { New("UIListLayout", { Padding = UDim.new(0, 5) }) })
 
