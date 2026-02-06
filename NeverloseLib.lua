@@ -1,5 +1,5 @@
 local Library = {
-    Version = "1.1.0",
+    Version = "1.1.2",
     AccentColor = Color3.fromRGB(255, 255, 255),
     ThemeObjects = {}
 }
@@ -145,6 +145,7 @@ function Library:CreateWindow(title)
     local ScreenGui = New("ScreenGui", {
         Name = "SoftUI",
         Parent = CoreGui,
+        ZIndexBehavior = Enum.ZIndexBehavior.Global,
         ResetOnSpawn = false
     })
 
@@ -156,6 +157,7 @@ function Library:CreateWindow(title)
         BackgroundColor3 = Color3.fromRGB(0, 0, 0), -- True Black
         BorderSizePixel = 0,
         BackgroundTransparency = 0.05,
+        ZIndex = 10,
         Parent = ScreenGui
     }, {
         New("UICorner", { CornerRadius = UDim.new(0, 12) }),
@@ -217,6 +219,7 @@ function Library:CreateWindow(title)
         ScrollBarThickness = 0,
         CanvasSize = UDim2.new(0, 0, 0, 0),
         AutomaticCanvasSize = Enum.AutomaticSize.Y,
+        ZIndex = 11,
         Parent = MainFrame
     }, { New("UIListLayout", { Padding = UDim.new(0, 5) }) })
 
@@ -227,6 +230,7 @@ function Library:CreateWindow(title)
         Size = UDim2.new(0, 120, 0, 50),
         Position = UDim2.new(0, 10, 1, -60),
         BackgroundColor3 = Color3.fromRGB(15,15,15), -- Slightly lighter black for depth
+        ZIndex = 11,
         Parent = MainFrame
     }, {
         New("UICorner", { CornerRadius = UDim.new(0, 8) }),
@@ -239,6 +243,7 @@ function Library:CreateWindow(title)
         AnchorPoint = Vector2.new(0, 0.5),
         BackgroundColor3 = Color3.fromRGB(40,40,40),
         Image = "rbxthumb://type=AvatarHeadShot&id="..Player.UserId.."&w=150&h=150",
+        ZIndex = 12,
         Parent = ProfileFrame
     }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
 
@@ -251,6 +256,7 @@ function Library:CreateWindow(title)
         TextSize = 12,
         Font = Enum.Font.GothamBold,
         TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 12,
         Parent = ProfileFrame
     })
 
@@ -263,6 +269,7 @@ function Library:CreateWindow(title)
         TextSize = 10,
         Font = Enum.Font.Gotham,
         TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 12,
         Parent = ProfileFrame
     })
 
@@ -272,6 +279,7 @@ function Library:CreateWindow(title)
         Size = UDim2.new(1, -145, 1, -50),
         Position = UDim2.new(0, 140, 0, 45),
         BackgroundTransparency = 1,
+        ZIndex = 11,
         Parent = MainFrame
     })
 
@@ -287,6 +295,7 @@ function Library:CreateWindow(title)
             Font = Enum.Font.Gotham,
             TextSize = 14,
             AutoButtonColor = false,
+            ZIndex = 12,
             Parent = Sidebar
         }, { New("UICorner", { CornerRadius = UDim.new(0, 6) }) })
 
@@ -299,7 +308,7 @@ function Library:CreateWindow(title)
             ScrollBarImageColor3 = Color3.fromRGB(60, 60, 60),
             CanvasSize = UDim2.new(0, 0, 0, 0),
             AutomaticCanvasSize = Enum.AutomaticSize.Y,
-            ZIndex = 5,
+            ZIndex = 12,
             Parent = ContentArea
         }, { 
             New("UIListLayout", { 
@@ -343,7 +352,7 @@ function Library:CreateWindow(title)
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 AutoButtonColor = false,
-                ZIndex = 6,
+                ZIndex = 13,
                 Parent = Page
             }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
 
@@ -365,7 +374,7 @@ function Library:CreateWindow(title)
             local ToggleFrame = New("Frame", {
                 Size = UDim2.new(1, -10, 0, 40),
                 BackgroundColor3 = Color3.fromRGB(35, 35, 35),
-                ZIndex = 6,
+                ZIndex = 13,
                 Parent = Page
             }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
 
@@ -378,6 +387,7 @@ function Library:CreateWindow(title)
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
+                ZIndex = 14,
                 Parent = ToggleFrame
             })
 
@@ -386,6 +396,7 @@ function Library:CreateWindow(title)
                 Position = UDim2.new(1, -45, 0.5, 0),
                 AnchorPoint = Vector2.new(0, 0.5),
                 BackgroundColor3 = state and Library.AccentColor or Color3.fromRGB(60, 60, 60),
+                ZIndex = 14,
                 Parent = ToggleFrame
             }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
 
@@ -394,6 +405,7 @@ function Library:CreateWindow(title)
                 Position = state and UDim2.new(1, -17, 0.5, 0) or UDim2.new(0, 3, 0.5, 0),
                 AnchorPoint = Vector2.new(0, 0.5),
                 BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+                ZIndex = 15,
                 Parent = SwitchBG
             }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
 
@@ -422,7 +434,7 @@ function Library:CreateWindow(title)
             local SliderFrame = New("Frame", {
                 Size = UDim2.new(1, -10, 0, 50),
                 BackgroundColor3 = Color3.fromRGB(35, 35, 35),
-                ZIndex = 6,
+                ZIndex = 13,
                 Parent = Page
             }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
 
@@ -435,6 +447,7 @@ function Library:CreateWindow(title)
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
+                ZIndex = 14,
                 Parent = SliderFrame
             })
 
@@ -446,6 +459,7 @@ function Library:CreateWindow(title)
                 TextColor3 = Library.AccentColor,
                 Font = Enum.Font.GothamBold,
                 TextSize = 14,
+                ZIndex = 14,
                 Parent = SliderFrame
             })
 
@@ -454,12 +468,14 @@ function Library:CreateWindow(title)
                 Position = UDim2.new(0.5, 0, 0.8, 0),
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+                ZIndex = 14,
                 Parent = SliderFrame
             }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
 
             local SliderBar = New("Frame", {
                 Size = UDim2.new((default - min) / (max - min), 0, 1, 0),
                 BackgroundColor3 = Library.AccentColor,
+                ZIndex = 15,
                 Parent = SliderBG
             }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
 
@@ -500,11 +516,11 @@ function Library:CreateWindow(title)
             local CPFrame = New("Frame", {
                 Size = UDim2.new(1, -10, 0, 50),
                 BackgroundColor3 = Color3.fromRGB(35, 35, 35),
-                ZIndex = 6,
+                ZIndex = 13,
                 Parent = Page
             }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
 
-            New("TextLabel", {
+            local CPLabel = New("TextLabel", {
                 Size = UDim2.new(1, -60, 0, 30),
                 Position = UDim2.new(0, 15, 0, 0),
                 BackgroundTransparency = 1,
@@ -513,6 +529,7 @@ function Library:CreateWindow(title)
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
+                ZIndex = 14,
                 Parent = CPFrame
             })
 
@@ -520,6 +537,7 @@ function Library:CreateWindow(title)
                 Size = UDim2.new(0, 32, 0, 20),
                 Position = UDim2.new(1, -45, 0, 5),
                 BackgroundColor3 = default,
+                ZIndex = 14,
                 Parent = CPFrame
             }, { New("UICorner", { CornerRadius = UDim.new(0, 4) }) })
 
@@ -528,6 +546,7 @@ function Library:CreateWindow(title)
                 Position = UDim2.new(0.5, 0, 0.8, 0),
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundTransparency = 0,
+                ZIndex = 14,
                 Parent = CPFrame
             }, {
                 New("UICorner", { CornerRadius = UDim.new(0, 4) }),
@@ -548,6 +567,7 @@ function Library:CreateWindow(title)
                 Position = UDim2.new(0, 0, 0.5, 0),
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+                ZIndex = 15,
                 Parent = HueSliderBG
             }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
 
