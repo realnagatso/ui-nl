@@ -1,5 +1,5 @@
 local Library = {
-    Version = "1.1.2",
+    Version = "1.1.3",
     AccentColor = Color3.fromRGB(255, 255, 255),
     ThemeObjects = {}
 }
@@ -29,6 +29,8 @@ function Library:ChangeAccent(color)
         elseif obj.Type == "Slider" then
             obj.Instance.BackgroundColor3 = color
             obj.Label.TextColor3 = color
+        elseif obj.Type == "AccentText" then
+            obj.Instance.TextColor3 = color
         elseif obj.Type == "Tab" then
             UpdateTabColors()
         end
@@ -172,17 +174,20 @@ function Library:CreateWindow(title)
         Parent = MainFrame
     })
 
-    New("TextLabel", {
+    local TitleLabel = New("TextLabel", {
         Size = UDim2.new(1, -60, 1, 0),
         Position = UDim2.new(0, 15, 0, 0),
         BackgroundTransparency = 1,
         Text = title,
-        TextColor3 = Color3.fromRGB(200, 200, 200),
+        TextColor3 = Library.AccentColor,
         TextSize = 18,
         Font = Enum.Font.GothamMedium,
         TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 11,
         Parent = TopBar
     })
+
+    table.insert(Library.ThemeObjects, { Type = "AccentText", Instance = TitleLabel })
 
     -- Draggable Functionality
     local dragging, dragInput, dragStart, startPos
