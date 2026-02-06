@@ -1,8 +1,11 @@
 local Library = {
+    Version = "1.1.0",
     AccentColor = Color3.fromRGB(255, 255, 255),
     ThemeObjects = {}
 }
 Library.__index = Library
+
+print("SoftUI Library Loaded | Version: " .. Library.Version)
 
 local function UpdateTabColors()
     for _, obj in pairs(Library.ThemeObjects) do
