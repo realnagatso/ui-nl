@@ -4,28 +4,6 @@ local Library = {
 }
 Library.__index = Library
 
-function Library:ChangeAccent(color)
-    Library.AccentColor = color
-    for _, obj in pairs(Library.ThemeObjects) do
-        if obj.Type == "Text" then
-            if obj.IsTab then
-                if obj.Instance.Parent.Parent.Visible then -- Check if it's the active page owner (simplified)
-                    -- For tabs, we'll handle them differently to avoid non-active ones becoming colored
-                end
-            else
-                obj.Instance.TextColor3 = color
-            end
-        elseif obj.Type == "Background" then
-            obj.Instance.BackgroundColor3 = color
-        elseif obj.Type == "Toggle" and obj.GetState() then
-            obj.Instance.BackgroundColor3 = color
-        elseif obj.Type == "Slider" then
-            obj.Instance.BackgroundColor3 = color
-            obj.Label.TextColor3 = color
-        end
-    end
-end
--- Improved Tab color handling
 local function UpdateTabColors()
     for _, obj in pairs(Library.ThemeObjects) do
         if obj.Type == "Tab" then
@@ -41,9 +19,7 @@ end
 function Library:ChangeAccent(color)
     Library.AccentColor = color
     for _, obj in pairs(Library.ThemeObjects) do
-        if obj.Type == "Text" then
-            obj.Instance.TextColor3 = color
-        elseif obj.Type == "Background" then
+        if obj.Type == "Background" then
             obj.Instance.BackgroundColor3 = color
         elseif obj.Type == "Toggle" and obj.GetState() then
             obj.Instance.BackgroundColor3 = color
@@ -335,7 +311,7 @@ function Library:CreateWindow(title)
             })
         })
 
-        table.insert(Library.ThemeObjects, { Type = "Text", Instance = TabButton })
+        table.insert(Library.ThemeObjects, { Type = "Tab", Instance = TabButton, Page = Page })
 
         TabButton.MouseButton1Click:Connect(function()
             for _, t in pairs(Window.Tabs) do
