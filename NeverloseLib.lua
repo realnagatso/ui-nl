@@ -1,6 +1,7 @@
 local Library = {
-    Version = "1.1.3",
+    Version = "1.1.4",
     AccentColor = Color3.fromRGB(255, 255, 255),
+    Rainbow = false,
     ThemeObjects = {}
 }
 Library.__index = Library
@@ -34,6 +35,19 @@ function Library:ChangeAccent(color)
         elseif obj.Type == "Tab" then
             UpdateTabColors()
         end
+    end
+end
+
+function Library:SetRainbow(state)
+    Library.Rainbow = state
+    if state then
+        task.spawn(function()
+            while Library.Rainbow do
+                local hue = tick() % 5 / 5
+                Library:ChangeAccent(Color3.fromHSV(hue, 0.8, 1))
+                task.wait()
+            end
+        end)
     end
 end
 
@@ -252,18 +266,20 @@ function Library:CreateWindow(title)
         Parent = ProfileFrame
     }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
 
-    New("TextLabel", {
+    local ProfileNameLabel = New("TextLabel", {
         Size = UDim2.new(1, -50, 0.5, 0),
         Position = UDim2.new(0, 45, 0.2, 0),
         BackgroundTransparency = 1,
         Text = Player.DisplayName,
-        TextColor3 = Color3.fromRGB(240,240,240),
+        TextColor3 = Library.AccentColor,
         TextSize = 12,
         Font = Enum.Font.GothamBold,
         TextXAlignment = Enum.TextXAlignment.Left,
         ZIndex = 12,
         Parent = ProfileFrame
     })
+
+    table.insert(Library.ThemeObjects, { Type = "AccentText", Instance = ProfileNameLabel })
 
     New("TextLabel", {
         Size = UDim2.new(1, -50, 0.5, 0),
