@@ -168,12 +168,58 @@ function Library:CreateWindow(title)
     -- Sidebar
     local Sidebar = New("ScrollingFrame", {
         Name = "Sidebar",
-        Size = UDim2.new(0, 130, 1, -50),
+        Size = UDim2.new(0, 130, 1, -110), -- Adjusted size for profile
         Position = UDim2.new(0, 5, 0, 45),
         BackgroundTransparency = 1,
         ScrollBarThickness = 0,
         Parent = MainFrame
     }, { New("UIListLayout", { Padding = UDim.new(0, 5) }) })
+
+    -- Profile Section (Discord-like)
+    local Player = game:GetService("Players").LocalPlayer
+    local ProfileFrame = New("Frame", {
+        Name = "ProfileFrame",
+        Size = UDim2.new(0, 120, 0, 50),
+        Position = UDim2.new(0, 10, 1, -60),
+        BackgroundColor3 = Color3.fromRGB(30,30,30),
+        Parent = MainFrame
+    }, {
+        New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+        New("UIStroke", { Color = Color3.fromRGB(45,45,45), Thickness = 1 })
+    })
+
+    local Avatar = New("ImageLabel", {
+        Size = UDim2.new(0, 32, 0, 32),
+        Position = UDim2.new(0, 8, 0.5, 0),
+        AnchorPoint = Vector2.new(0, 0.5),
+        BackgroundColor3 = Color3.fromRGB(40,40,40),
+        Image = "rbxthumb://type=AvatarHeadShot&id="..Player.UserId.."&w=150&h=150",
+        Parent = ProfileFrame
+    }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+
+    New("TextLabel", {
+        Size = UDim2.new(1, -50, 0.5, 0),
+        Position = UDim2.new(0, 45, 0.2, 0),
+        BackgroundTransparency = 1,
+        Text = Player.DisplayName,
+        TextColor3 = Color3.fromRGB(240,240,240),
+        TextSize = 12,
+        Font = Enum.Font.GothamBold,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = ProfileFrame
+    })
+
+    New("TextLabel", {
+        Size = UDim2.new(1, -50, 0.5, 0),
+        Position = UDim2.new(0, 45, 0.5, 0),
+        BackgroundTransparency = 1,
+        Text = "@"..Player.Name,
+        TextColor3 = Color3.fromRGB(150,150,150),
+        TextSize = 10,
+        Font = Enum.Font.Gotham,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = ProfileFrame
+    })
 
     -- Content Area
     local ContentArea = New("Frame", {
