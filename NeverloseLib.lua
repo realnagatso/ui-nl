@@ -1,7 +1,24 @@
 local Library = {
-    AccentColor = Color3.fromRGB(255, 255, 255) -- Default: White (clean on black)
+    AccentColor = Color3.fromRGB(255, 255, 255),
+    ThemeObjects = {}
 }
 Library.__index = Library
+
+function Library:ChangeAccent(color)
+    Library.AccentColor = color
+    for _, obj in pairs(Library.ThemeObjects) do
+        if obj.Type == "Text" then
+            obj.Instance.TextColor3 = color
+        elseif obj.Type == "Background" then
+            obj.Instance.BackgroundColor3 = color
+        elseif obj.Type == "Toggle" and obj.GetState() then
+            obj.Instance.BackgroundColor3 = color
+        elseif obj.Type == "Slider" then
+            obj.Instance.BackgroundColor3 = color
+            obj.Label.TextColor3 = color
+        end
+    end
+end
 
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -280,6 +297,8 @@ function Library:CreateWindow(title)
             })
         })
 
+        table.insert(Library.ThemeObjects, { Type = "Text", Instance = TabButton })
+
         TabButton.MouseButton1Click:Connect(function()
             for _, t in pairs(Window.Tabs) do
                 t.Page.Visible = false
@@ -368,6 +387,12 @@ function Library:CreateWindow(title)
                 Parent = ToggleFrame
             })
 
+            table.insert(Library.ThemeObjects, { 
+                Type = "Toggle", 
+                Instance = SwitchBG, 
+                GetState = function() return state end 
+            })
+
             ClickBtn.MouseButton1Click:Connect(function()
                 state = not state
                 TweenService:Create(SwitchBG, TweenInfo.new(0.3), { BackgroundColor3 = state and Library.AccentColor or Color3.fromRGB(60, 60, 60) }):Play()
@@ -421,6 +446,12 @@ function Library:CreateWindow(title)
                 Parent = SliderBG
             }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
 
+            table.insert(Library.ThemeObjects, { 
+                Type = "Slider", 
+                Instance = SliderBar, 
+                Label = ValueLabel 
+            })
+
             local function Update(input)
                 local pos = math.clamp((input.Position.X - SliderBG.AbsolutePosition.X) / SliderBG.AbsoluteSize.X, 0, 1)
                 local val = math.floor(min + (max - min) * pos)
@@ -437,6 +468,88 @@ function Library:CreateWindow(title)
                 end
             end)
             SliderFrame.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = false
+                end
+            end)
+            UserInputService.InputChanged:Connect(function(input)
+                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    Update(input)
+                end
+            end)
+        end
+
+        function Tab:CreateColorPicker(text, default, callback)
+            local CPFrame = New("Frame", {
+                Size = UDim2.new(1, -10, 0, 50),
+                BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+                ZIndex = 6,
+                Parent = Page
+            }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
+
+            New("TextLabel", {
+                Size = UDim2.new(1, -60, 0, 30),
+                Position = UDim2.new(0, 15, 0, 0),
+                BackgroundTransparency = 1,
+                Text = text,
+                TextColor3 = Color3.fromRGB(220, 220, 220),
+                Font = Enum.Font.Gotham,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = CPFrame
+            })
+
+            local ColorPreview = New("Frame", {
+                Size = UDim2.new(0, 32, 0, 20),
+                Position = UDim2.new(1, -45, 0, 5),
+                BackgroundColor3 = default,
+                Parent = CPFrame
+            }, { New("UICorner", { CornerRadius = UDim.new(0, 4) }) })
+
+            local HueSliderBG = New("Frame", {
+                Size = UDim2.new(1, -30, 0, 10),
+                Position = UDim2.new(0.5, 0, 0.8, 0),
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                BackgroundTransparency = 0,
+                Parent = CPFrame
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 4) }),
+                New("UIGradient", {
+                    Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0, Color3.fromHSV(0, 1, 1)),
+                        ColorSequenceKeypoint.new(0.2, Color3.fromHSV(0.2, 1, 1)),
+                        ColorSequenceKeypoint.new(0.4, Color3.fromHSV(0.4, 1, 1)),
+                        ColorSequenceKeypoint.new(0.6, Color3.fromHSV(0.6, 1, 1)),
+                        ColorSequenceKeypoint.new(0.8, Color3.fromHSV(0.8, 1, 1)),
+                        ColorSequenceKeypoint.new(1, Color3.fromHSV(1, 1, 1))
+                    })
+                })
+            })
+
+            local HueCursor = New("Frame", {
+                Size = UDim2.new(0, 4, 1, 4),
+                Position = UDim2.new(0, 0, 0.5, 0),
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+                Parent = HueSliderBG
+            }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+
+            local function Update(input)
+                local pos = math.clamp((input.Position.X - HueSliderBG.AbsolutePosition.X) / HueSliderBG.AbsoluteSize.X, 0, 1)
+                local color = Color3.fromHSV(pos, 1, 1)
+                HueCursor.Position = UDim2.new(pos, 0, 0.5, 0)
+                ColorPreview.BackgroundColor3 = color
+                callback(color)
+            end
+
+            local dragging = false
+            CPFrame.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = true
+                    Update(input)
+                end
+            end)
+            CPFrame.InputEnded:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
                     dragging = false
                 end
